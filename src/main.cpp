@@ -9,6 +9,7 @@
 #include "geometry.h"
 #include "shading.h"
 #include "light.h"
+#include "background.h"
 using std::vector;
 
 
@@ -21,26 +22,46 @@ CheckerShader checker;
 CheckerShader ceiling;
 Plane plane2;
 vector<light> sceneLights;
+background sceneBackground;
 
 void setupScene()
 {
     //Light 1
     pointLight light1 = pointLight();
-    light1.lightIntensity = 100000.0;
-    light1.position = Vector(-50, 80, 200);
+    light1.lightIntensity = 25000.0;
+    light1.position = Vector(-215, 80, 100);
+    light1.lightColor = Color(0.5, 0.3, 0.6);
     sceneLights.push_back(light1);
 
     //Light 2
     pointLight light2 = pointLight();
-    light2.lightIntensity = 100000.0;
-    light2.position = Vector(50, 80, 200);
+    light2.lightIntensity = 25000.0;
+    light2.position = Vector(285, 80, 100);
+    light2.lightColor = Color(0.1, 0.5, 0.7);
     sceneLights.push_back(light2);
 
-	camera.position = Vector(35, 60, -100);
+    //Light 3
+    pointLight light3 = pointLight();
+    light3.lightIntensity = 25000.0;
+    light3.position = Vector(35, 40, 100);
+    light3.lightColor = Color(0.9, 0.7, 0.5);
+    sceneLights.push_back(light3);
+
+    //Light 4- behind the camera
+    pointLight light4 = pointLight();
+    light4.lightIntensity = 25000.0;
+    light4.position = Vector(35, 40, -200);
+    light4.lightColor = Color(0.8, 0.7, 0.9);
+    sceneLights.push_back(light4);
+
+    //Background color
+    sceneBackground = solidColorBackground(Color(0, 0, 0.2));
+
+	camera.position = Vector(35, 60, -200);
 	camera.yaw = 0;
 	camera.pitch = 0;
 	camera.roll = 0;
-	camera.fov = 120;
+	camera.fov = 90;
 	camera.aspectRatio = float(frameWidth()) / float(frameHeight());
 	plane.y = 1;
 	plane2.y = 200;
@@ -70,7 +91,7 @@ Color raytrace(Ray ray)
 	}
 	// check if we hit the sky:
 	if (closestNode == NULL)
-		return Color(0, 0, 0); // TODO(vesko): return background color
+		return sceneBackground.color;
 	else
 		return closestNode->shader->shade(ray, closestInfo);
 }

@@ -22,6 +22,7 @@
  * @Brief Contains implementations of shader classes
  */
 #include <vector>
+#include <iostream>
 #include "shading.h"
 #include "light.h"
 using std::vector;
@@ -37,6 +38,11 @@ Color CheckerShader::shade(const Ray& ray, const IntersectionInfo& info)
 
 	Vector v1 = info.normal;
 
+    double lightCoeff = 0;
+    double globalLightCoeff = 0;
+    Color lightColor;
+    lightColor.makeZero();
+
 	for(light& singleLight : sceneLights)
     {
         Vector v2 = singleLight.position - info.ip;
@@ -44,10 +50,54 @@ Color CheckerShader::shade(const Ray& ray, const IntersectionInfo& info)
         v2.normalize();
         double lambertCoeff = dot(v1, v2);
         double attenuationCoeff = 1.0 / distanceToLightSqr;
-        double lightSceneCoeff = 1.0 / sceneLights.size();
-        double lightIntensity = singleLight.lightIntensity * lightSceneCoeff;
-        checkerColor = checkerColor * lambertCoeff * attenuationCoeff * lightIntensity;
+        double lightIntensity = singleLight.lightIntensity;
+        double currentLightCoeff = lambertCoeff * attenuationCoeff;
+        globalLightCoeff += currentLightCoeff;
+        lightColor += singleLight.lightColor * currentLightCoeff * lightIntensity;
+        lightCoeff += currentLightCoeff * lightIntensity;
     }
 
-	return checkerColor;
+	return (1 - globalLightCoeff) * (checkerColor * lightCoeff) * lightColor;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
